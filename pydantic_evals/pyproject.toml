@@ -47,7 +47,7 @@ dependencies = [
     "rich>=13.9.4",
     "logfire-api>=1.2.0",
     "pydantic>=2.10",
-    "pydantic-ai-slim=={{ version }}",
+    "pydantic-ai-slim>=0.2.18",
     "anyio>=0",
     "eval-type-backport>=0; python_version < '3.11'",
     "pyyaml>=6.0.2",
