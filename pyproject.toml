@@ -11,7 +11,7 @@ style = "pep440"
 bump = true
 
 [project]
-name = "pydantic-ai-fork"
+name = "pydantic-ai"
 dynamic = ["version", "dependencies", "optional-dependencies"]
 description = "Agent Framework / shim to use Pydantic with LLMs"
 authors = [
