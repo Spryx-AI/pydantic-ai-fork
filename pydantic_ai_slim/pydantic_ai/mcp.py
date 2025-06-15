@@ -15,6 +15,7 @@ import anyio
 import httpx
 from anyio.streams.memory import MemoryObjectReceiveStream, MemoryObjectSendStream
 from mcp.client.streamable_http import GetSessionIdCallback, streamablehttp_client
+from mcp.shared.exceptions import McpError
 from mcp.shared.message import SessionMessage
 from mcp.types import (
     AudioContent,
@@ -42,7 +43,13 @@ except ImportError as _import_error:
         'you can use the `mcp` optional group — `pip install "pydantic-ai-slim[mcp]"`'
     ) from _import_error
 
-__all__ = 'MCPServer', 'MCPServerStdio', 'MCPServerHTTP', 'MCPServerSSE', 'MCPServerStreamableHTTP'
+__all__ = (
+    'MCPServer',
+    'MCPServerStdio',
+    'MCPServerHTTP',
+    'MCPServerSSE',
+    'MCPServerStreamableHTTP',
+)
 
 
 class MCPServer(ABC):
@@ -127,7 +134,10 @@ class MCPServer(ABC):
         Raises:
             ModelRetry: If the tool call fails.
         """
-        result = await self._client.call_tool(self.get_unprefixed_tool_name(tool_name), arguments)
+        try:
+            result = await self._client.call_tool(self.get_unprefixed_tool_name(tool_name), arguments)
+        except McpError as e:
+            raise ModelRetry(f'Error calling tool {tool_name}: {e}') from e
 
         content = [self._map_tool_result_part(part) for part in result.content]
 
@@ -384,7 +394,10 @@ class _MCPServerHTTP(MCPServer):
     async def client_streams(
         self,
     ) -> AsyncIterator[
-        tuple[MemoryObjectReceiveStream[SessionMessage | Exception], MemoryObjectSendStream[SessionMessage]]
+        tuple[
+            MemoryObjectReceiveStream[SessionMessage | Exception],
+            MemoryObjectSendStream[SessionMessage],
+        ]
     ]:  # pragma: no cover
         if self.http_client and self.headers:
             raise ValueError('`http_client` is mutually exclusive with `headers`.')
@@ -413,7 +426,11 @@ class _MCPServerHTTP(MCPServer):
             ):
                 yield read_stream, write_stream
         else:
-            async with transport_client_partial(headers=self.headers) as (read_stream, write_stream, *_):
+            async with transport_client_partial(headers=self.headers) as (
+                read_stream,
+                write_stream,
+                *_,
+            ):
                 yield read_stream, write_stream
 
     def _get_log_level(self) -> LoggingLevel | None:
