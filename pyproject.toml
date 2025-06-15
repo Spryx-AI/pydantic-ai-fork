@@ -11,7 +11,7 @@ style = "pep440"
 bump = true
 
 [project]
-name = "pydantic-ai"
+name = "pydantic-ai-fork"
 dynamic = ["version", "dependencies", "optional-dependencies"]
 description = "Agent Framework / shim to use Pydantic with LLMs"
 authors = [
@@ -46,7 +46,7 @@ requires-python = ">=3.9"
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning]
 dependencies = [
-    "pydantic-ai-slim[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,cli,mcp,evals,a2a]=={{ version }}",
+    "pydantic-ai-slim-fork[openai,vertexai,google,groq,anthropic,mistral,cohere,bedrock,cli,mcp,evals,a2a]=={{ version }}",
 ]
 
 [tool.hatch.metadata.hooks.uv-dynamic-versioning.optional-dependencies]
@@ -63,7 +63,7 @@ Changelog = "https://github.com/pydantic/pydantic-ai/releases"
 pai = "pydantic_ai._cli:cli_exit" # TODO remove this when clai has been out for a while
 
 [tool.uv.sources]
-pydantic-ai-slim = { workspace = true }
+pydantic-ai-slim-fork = { workspace = true }
 pydantic-evals = { workspace = true }
 pydantic-graph = { workspace = true }
 pydantic-ai-examples = { workspace = true }
